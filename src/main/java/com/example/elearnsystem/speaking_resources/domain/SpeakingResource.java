@@ -5,16 +5,15 @@ import javax.persistence.*;
 @Entity
 @Table(name="t_speakingResources")
 public class SpeakingResource {
-    private  Long id;
+    private Long id;
     private String resourcesTitle;  //资源标题
     private String resourcesCategory; //资源分类
     private String resourcesText; // 资源正文
     private String resourcesTranslation_text; // 资源译文
     private String resourcesNetworkUrl; // 音频网络URL链接
     private String resourcesLocalUrl; // 音频本地URL链接
-    private String resourcesNetworkPic; // 音频图片
-    private String resourcesLocalPic; // 音频本地图片
-    private boolean inSystenm; // 资源存库标志
+
+    private Boolean inSystem; // 资源存库标志
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -46,18 +45,15 @@ public class SpeakingResource {
         return resourcesLocalUrl;
     }
 
-    public String getResourcesNetworkPic() {
-        return resourcesNetworkPic;
+    public Boolean getInSystem() {
+        return inSystem;
     }
 
-    public String getResourcesLocalPic() {
-        return resourcesLocalPic;
-    }
-
-    public boolean isInSystenm() {
-        return inSystenm;
-    }
     /*------------------------------------set函数----------------------------*/
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public void setResourcesTitle(String resourcesTitle) {
         this.resourcesTitle = resourcesTitle;
@@ -83,15 +79,7 @@ public class SpeakingResource {
         this.resourcesLocalUrl = resourcesLocalUrl;
     }
 
-    public void setResourcesNetworkPic(String resourcesNetworkPic) {
-        this.resourcesNetworkPic = resourcesNetworkPic;
-    }
-
-    public void setResourcesLocalPic(String resourcesLocalPic) {
-        this.resourcesLocalPic = resourcesLocalPic;
-    }
-
-    public void setInSystenm(boolean inSystenm) {
-        this.inSystenm = inSystenm;
+    public void setInSystem(Boolean inSystem) {
+        this.inSystem = inSystem;
     }
 }

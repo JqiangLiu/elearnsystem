@@ -4,10 +4,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 public class MyPageRequest {
-    private int 	page 	= 0;
-    private int 	limit	= 2 ;
+    private int 	page 	= 1;
+    private int 	limit	= 15;
     private String  sort	= "id";
-    private String  dir 	= "DESC";
+    private String  dir 	= "ASC";
 
     public void setPage(int page) {this.page = page;}
     public void setLimit(int limit) {this.limit = limit;}

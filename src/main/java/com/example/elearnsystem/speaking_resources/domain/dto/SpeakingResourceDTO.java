@@ -1,5 +1,14 @@
 package com.example.elearnsystem.speaking_resources.domain.dto;
 
+import com.example.elearnsystem.speaking_resources.domain.SpeakingResource;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.jpa.domain.Specification;
+
+import javax.persistence.criteria.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 public class SpeakingResourceDTO {
     private  Long id;
     private String resourcesTitle;  //资源标题
@@ -8,9 +17,8 @@ public class SpeakingResourceDTO {
     private String resourcesTranslation_text; // 资源译文
     private String resourcesNetworkUrl; // 音频网络URL链接
     private String resourcesLocalUrl; // 音频本地URL链接
-    private String resourcesNetworkPic; // 音频图片
-    private String resourcesLocalPic; // 音频本地图片
-    private boolean inSystenm; // 资源存库标志
+    private Boolean inSystem; // 资源存库标志
+
 
     public Long getId() {
         return id;
@@ -40,16 +48,8 @@ public class SpeakingResourceDTO {
         return resourcesLocalUrl;
     }
 
-    public String getResourcesNetworkPic() {
-        return resourcesNetworkPic;
-    }
-
-    public String getResourcesLocalPic() {
-        return resourcesLocalPic;
-    }
-
-    public boolean isInSystenm() {
-        return inSystenm;
+    public Boolean getInSystem() {
+        return inSystem;
     }
 
     public void setId(Long id) {
@@ -80,15 +80,8 @@ public class SpeakingResourceDTO {
         this.resourcesLocalUrl = resourcesLocalUrl;
     }
 
-    public void setResourcesNetworkPic(String resourcesNetworkPic) {
-        this.resourcesNetworkPic = resourcesNetworkPic;
+    public void setInSystem(Boolean inSystem) {
+        this.inSystem = inSystem;
     }
 
-    public void setResourcesLocalPic(String resourcesLocalPic) {
-        this.resourcesLocalPic = resourcesLocalPic;
-    }
-
-    public void setInSystenm(boolean inSystenm) {
-        this.inSystenm = inSystenm;
-    }
 }
