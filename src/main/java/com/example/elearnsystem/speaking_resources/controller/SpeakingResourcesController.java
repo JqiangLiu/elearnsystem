@@ -1,14 +1,21 @@
 package com.example.elearnsystem.speaking_resources.controller;
 
 import com.example.elearnsystem.common.page.MyPageRequest;
+import com.example.elearnsystem.common.spider.EPageProcessor;
+
+import com.example.elearnsystem.common.spider.downloader.SeleniumDownloader;
+import com.example.elearnsystem.common.spider.scheduler.LevelLimitScheduler;
 import com.example.elearnsystem.speaking_resources.domain.SpeakingResource;
 import com.example.elearnsystem.speaking_resources.domain.dto.SpeakingResourceDTO;
 import com.example.elearnsystem.speaking_resources.service.SpeakingResourcesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+import us.codecraft.webmagic.Spider;
+import us.codecraft.webmagic.pipeline.ConsolePipeline;
+//import us.codecraft.webmagic.downloader.selenium.SeleniumDownloader;
+//import us.codecraft.webmagic.pipeline.JsonFilePipeline;
 
 import java.util.List;
 
@@ -21,8 +28,15 @@ public class SpeakingResourcesController {
     private SpeakingResourcesService speakingResourcesService;
 
     @PostMapping("/search")
-    public List<SpeakingResourceDTO> saveAll(){
+    public List<SpeakingResourceDTO> saveAll(String id){
         //1、调用爬虫去抓
+        Spider spider = Spider.create(new EPageProcessor());
+        //重写Downloader，解决用phantomJS渲染页面重复下载的BUG
+        SeleniumDownloader seleniumDownloader = new SeleniumDownloader();
+        spider.setDownloader(seleniumDownloader);
+        spider.setScheduler(new LevelLimitScheduler());
+        spider.addPipeline(new ConsolePipeline());
+        spider.addUrl("http://xiu.kekenet.com/index.php/main/column.html?tag_id="+id).thread(1).run();
         // 2、保存在List集合传进去
 //        speakingResourcesService.saveAll(resources);
         String resourcesCategory = null;

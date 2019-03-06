@@ -5,7 +5,6 @@ import com.example.elearnsystem.speaking_resources.domain.SpeakingResource;
 import com.example.elearnsystem.speaking_resources.domain.dto.SpeakingResourceDTO;
 import com.example.elearnsystem.speaking_resources.repository.SpeakingResourcesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;

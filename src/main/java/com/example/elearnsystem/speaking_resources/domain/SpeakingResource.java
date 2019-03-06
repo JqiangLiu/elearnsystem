@@ -12,7 +12,7 @@ public class SpeakingResource {
     private String resourcesTranslation_text; // 资源译文
     private String resourcesNetworkUrl; // 音频网络URL链接
     private String resourcesLocalUrl; // 音频本地URL链接
-
+    private String resourcesParentUrl; // 父级URL，用于去重
     private Boolean inSystem; // 资源存库标志
 
     @Id
@@ -43,6 +43,10 @@ public class SpeakingResource {
 
     public String getResourcesLocalUrl() {
         return resourcesLocalUrl;
+    }
+
+    public String getResourcesParentUrl() {
+        return resourcesParentUrl;
     }
 
     public Boolean getInSystem() {
@@ -77,6 +81,10 @@ public class SpeakingResource {
 
     public void setResourcesLocalUrl(String resourcesLocalUrl) {
         this.resourcesLocalUrl = resourcesLocalUrl;
+    }
+
+    public void setResourcesParentUrl(String resourcesParentUrl) {
+        this.resourcesParentUrl = resourcesParentUrl;
     }
 
     public void setInSystem(Boolean inSystem) {
