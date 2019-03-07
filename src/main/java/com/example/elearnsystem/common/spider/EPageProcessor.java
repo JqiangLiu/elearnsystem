@@ -123,6 +123,7 @@ public class EPageProcessor implements PageProcessor {
     * 分析页详情
     * */
     private void analysisDetailPage(Page page, Html html){
+        page.putField("resourcesParentUrl",page.getUrl().toString());
         page.putField("resourcesTitle",html.xpath("//*[@id=\"nav_btn10\"]/div[7]/div[1]/dl[2]/dt/span[2]/text()").toString());
         page.putField("resourcesNetworkUrl",html.xpath("//*[@id=\"player\"]/param[4]/@value")
                 .regex("http://k6.kekenet.com/Sound/\\d+/\\d+/\\w+\\.mp3").toString());
