@@ -32,7 +32,7 @@ public class SpeakingResourcesController {
     private SpeakingResourcesService speakingResourcesService;
 
     @PostMapping("/search")
-    public void searchResources(String id){
+    public List<SpeakingResourceDTO> searchResources(String id){
         MySQLPipeline mySQLPipeline = new MySQLPipeline();
         //1、调用爬虫去抓
         Spider spider = Spider.create(new EPageProcessor());
@@ -41,10 +41,10 @@ public class SpeakingResourcesController {
         spider.setDownloader(seleniumDownloader);
         spider.setScheduler(new FileCacheQueueScheduler("C:\\Users\\Mr.Liu\\IdeaProjects\\elearnsystem\\src\\main\\resources\\static"));
         spider.addPipeline(new ConsolePipeline()).addPipeline(mySQLPipeline);
-        spider.addUrl("http://xiu.kekenet.com/index.php/main/column.html?tag_id="+id).thread(2).run();
+        spider.addUrl("http://xiu.kekenet.com/index.php/main/column.html?tag_id="+id).thread(5).run();
 //        System.out.println("抓完了！！！！");
         List<SpeakingResource> list = mySQLPipeline.getCollected();
-        saveAll(list);
+        return saveAll(list);
     }
 
     @PostMapping("/saveAll")
