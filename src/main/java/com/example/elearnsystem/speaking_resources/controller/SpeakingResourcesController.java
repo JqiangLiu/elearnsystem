@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import us.codecraft.webmagic.Spider;
+import us.codecraft.webmagic.downloader.HttpClientDownloader;
 import us.codecraft.webmagic.pipeline.CollectorPipeline;
 import us.codecraft.webmagic.pipeline.ConsolePipeline;
 import us.codecraft.webmagic.pipeline.ResultItemsCollectorPipeline;
@@ -37,8 +38,8 @@ public class SpeakingResourcesController {
         //1、调用爬虫去抓
         Spider spider = Spider.create(new EPageProcessor());
         //重写Downloader，解决用phantomJS渲染页面重复下载的BUG
-        SeleniumDownloader seleniumDownloader = new SeleniumDownloader();
-        spider.setDownloader(seleniumDownloader);
+//        SeleniumDownloader seleniumDownloader = new SeleniumDownloader();
+        spider.setDownloader(new HttpClientDownloader());
         spider.setScheduler(new FileCacheQueueScheduler("C:\\Users\\Mr.Liu\\IdeaProjects\\elearnsystem\\src\\main\\resources\\static"));
         spider.addPipeline(new ConsolePipeline()).addPipeline(mySQLPipeline);
         spider.addUrl("http://xiu.kekenet.com/index.php/main/column.html?tag_id="+id).thread(5).run();

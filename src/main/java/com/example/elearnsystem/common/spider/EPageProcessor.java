@@ -16,6 +16,7 @@ public class EPageProcessor implements PageProcessor {
     private static Integer secondPageNum = 1;
     private String FIRST_PAGINATION_URL = "http://xiu\\.kekenet\\.com/index\\.php/main/column\\.html\\?tag\\_id=\\d+";
     private String SECOND_PAGINATION_URL = "http://xiu\\.kekenet\\.com/list/\\d+";
+    private String SECOND_PAGINATION_URL_X = "http://xiu\\.kekenet\\.com/index\\.php/main/article\\_list\\.html\\?catid=\\d+\\&page=\\d+";
     private Site site = Site
             .me().setCharset("UTF-8")
             .setCycleRetryTimes(3) // 重试次数
@@ -38,15 +39,17 @@ public class EPageProcessor implements PageProcessor {
 //        System.out.println(page.getHtml());
         Html html = page.getHtml();
         if (page.getUrl().regex(FIRST_PAGINATION_URL).match()){ //判断
-//            if (isFirstListPageonOne(page,html)){
+            if (isFirstListPageonOne(page,html)){
 //                analysisFirstPagination(page,html);
-//            }
+            }
             analysisFirstListPage(page,html);
-        }else if (page.getUrl().regex(SECOND_PAGINATION_URL).match()){
-//            if (isSecondListPageonOne(page,html)){
-//                analysisSecondPagination(page,html);
-//            }
-            analysisSecondListPage(page,html);
+        }else if (page.getUrl().regex(SECOND_PAGINATION_URL).match() || page.getUrl().regex(SECOND_PAGINATION_URL_X).match()){
+            if (isSecondListPageonOne(page,html)){
+                analysisSecondPagination(page,html);
+                analysisSecondListPage(page,html);
+            }else{
+                analysisSecondListPageX(page,html);
+            }
         }else {
             analysisDetailPage(page,html);
         }
@@ -57,7 +60,7 @@ public class EPageProcessor implements PageProcessor {
     * 将首目录的链接抽取，包括所有分页的目录链接
     * 1、判断首目录是否有分页，并将第一页链接全部保存进队列*/
     private void analysisFirstListPage(Page page, Html html){
-        List<String> pageList = html.xpath("//div[@class='column_list']/dl[1]/dt/p[1]/a/@href").all();
+        List<String> pageList = html.xpath("//div[@class='column_list']/dl/dt/p[1]/a/@href").all();
         page.addTargetRequests(pageList);
     }
     /*
@@ -71,7 +74,10 @@ public class EPageProcessor implements PageProcessor {
             String regEx="[^0-9]";
             Pattern p = Pattern.compile(regEx);
             Matcher m = p.matcher(s);
-            sumPageNum = Integer.parseInt(m.replaceAll("").trim())/7+1;
+            String r = m.replaceAll("").trim();
+            if (r.length() > 0){
+                sumPageNum = Integer.parseInt(m.replaceAll("").trim())/7+1;
+            }
         }
         List<String> pageList = new ArrayList<>();
         while (i<=sumPageNum){
@@ -97,21 +103,23 @@ public class EPageProcessor implements PageProcessor {
             String regEx="[^0-9]";
             Pattern p = Pattern.compile(regEx);
             Matcher m = p.matcher(s);
-            sumPageNum = Integer.parseInt(m.replaceAll("").trim())/10;
+            String r = m.replaceAll("").trim();
+            if (r.length() > 0)
+                sumPageNum = Integer.parseInt(m.replaceAll("").trim())/10+1;
         }
         List<String> pageList = new ArrayList<>();
         while (i<=sumPageNum){
-            String cpage = page.getUrl()+"&tab=spoken&page="+i;
+            String cpage = "http://xiu.kekenet.com/index.php/main/article_list.html?catid="+page.getUrl().regex("\\d+")+"&page="+i;
             pageList.add(cpage);
             ++i;
         }
         pageList = new ArrayList(new HashSet(pageList));
 
-        List<String> pageParameterList = new ArrayList<>();
-        for (String value: pageList) {
-            pageParameterList.add(value);
-        }
-        page.addTargetRequests(pageParameterList);
+//        List<String> pageParameterList = new ArrayList<>();
+//        for (String value: pageList) {
+//            pageParameterList.add(value);
+//        }
+        page.addTargetRequests(pageList);
     }
     /*
     * 分析次目录列表*/
@@ -120,15 +128,21 @@ public class EPageProcessor implements PageProcessor {
         page.addTargetRequests(pageList);
     }
     /*
+     * 分析次目录非首页列表*/
+    private void analysisSecondListPageX(Page page, Html html){
+        List<String> pageList = html.xpath("//ul/li/a/@href").all();
+        page.addTargetRequests(pageList);
+    }
+    /*
     * 分析页详情
     * */
     private void analysisDetailPage(Page page, Html html){
         page.putField("resourcesParentUrl",page.getUrl().toString());
-        page.putField("resourcesTitle",html.xpath("//*[@id=\"nav_btn10\"]/div[7]/div[1]/dl[2]/dt/span[2]/text()").toString());
-        page.putField("resourcesNetworkUrl",html.xpath("//*[@id=\"player\"]/param[4]/@value")
-                .regex("http://k6.kekenet.com/Sound/\\d+/\\d+/\\w+\\.mp3").toString());
-        page.putField("resourcesText",html.xpath("//*[@id=\"nav_btn10\"]/div[7]/div[1]/div/div[1]/text()").toString());
-        page.putField("resourcesTranslation_text",html.xpath("//*[@id=\"nav_btn10\"]/div[7]/div[1]/div/div[2]/text()").toString());
+        page.putField("resourcesTitle",html.xpath("//div[@class='clear_div center_box']/div[1]/dl[2]/dt/span[2]/text()").toString());
+        page.putField("resourcesNetworkUrl",html.xpath("//object[@id='player']/param[4]/@value")
+                .regex("file=([\\s\\S]*)\\&autostart").toString());
+        page.putField("resourcesText",html.xpath("//div[@class='clear_div play_box']/div[1]/text()").toString());
+        page.putField("resourcesTranslation_text",html.xpath("//div[@class='clear_div play_box']/div[2]/text()").toString());
     }
 
     /*
@@ -140,7 +154,12 @@ public class EPageProcessor implements PageProcessor {
             String regEx="[^0-9]";
             Pattern p = Pattern.compile(regEx);
             Matcher m = p.matcher(s);
-            return (Integer.parseInt(m.replaceAll("").trim()) == 1);
+            String r = m.replaceAll("").trim();
+            if (r.length() > 0){
+                return (Integer.parseInt(r) == 1);
+            }else{
+                return false;
+            }
         }else{
             return false;
         }
@@ -153,8 +172,14 @@ public class EPageProcessor implements PageProcessor {
             String regEx="[^0-9]";
             Pattern p = Pattern.compile(regEx);
             Matcher m = p.matcher(s);
-            return (Integer.parseInt(m.replaceAll("").trim()) == 1);
+            String r = m.replaceAll("").trim();
+            if (r.length() > 0){
+                return (Integer.parseInt(r) == 1);
+            }else{
+                return false;
+            }
+        }else{
+            return false;
         }
-        return null;
     }
 }
