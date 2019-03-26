@@ -1,22 +1,17 @@
-package com.example.elearnsystem.speaking_resources.domain;
+package com.example.elearnsystem.speakingResources.domain.dto;
 
-import javax.persistence.*;
-
-@Entity
-@Table(name="t_speakingResources")
-public class SpeakingResource {
-    private Long id;
+public class SpeakingResourceDTO {
+    private  Long id;
     private String resourcesTitle;  //资源标题
     private String resourcesCategory; //资源分类
     private String resourcesText; // 资源正文
     private String resourcesTranslation_text; // 资源译文
     private String resourcesNetworkUrl; // 音频网络URL链接
-    private String resourcesLocalUrl; // 音频本地URL链接
-    private String resourcesParentUrl; // 父级URL，用于去重
     private Boolean inSystem; // 资源存库标志
+    private Long sum; //总记录数
+    private int updateSum; // 新抓取的总记录数
 
-    @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+
     public Long getId() {
         return id;
     }
@@ -41,19 +36,17 @@ public class SpeakingResource {
         return resourcesNetworkUrl;
     }
 
-    public String getResourcesLocalUrl() {
-        return resourcesLocalUrl;
-    }
-
-    public String getResourcesParentUrl() {
-        return resourcesParentUrl;
-    }
-
     public Boolean getInSystem() {
         return inSystem;
     }
 
-    /*------------------------------------set函数----------------------------*/
+    public Long getSum() {
+        return sum;
+    }
+
+    public int getUpdateSum() {
+        return updateSum;
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -79,15 +72,15 @@ public class SpeakingResource {
         this.resourcesNetworkUrl = resourcesNetworkUrl;
     }
 
-    public void setResourcesLocalUrl(String resourcesLocalUrl) {
-        this.resourcesLocalUrl = resourcesLocalUrl;
-    }
-
-    public void setResourcesParentUrl(String resourcesParentUrl) {
-        this.resourcesParentUrl = resourcesParentUrl;
-    }
-
     public void setInSystem(Boolean inSystem) {
         this.inSystem = inSystem;
+    }
+
+    public void setSum(Long sum) {
+        this.sum = sum;
+    }
+
+    public void setUpdateSum(int updateSum) {
+        this.updateSum = updateSum;
     }
 }

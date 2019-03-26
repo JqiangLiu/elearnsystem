@@ -1,25 +1,22 @@
-package com.example.elearnsystem.speaking_resources.domain.dto;
+package com.example.elearnsystem.speakingResources.domain;
 
-import com.example.elearnsystem.speaking_resources.domain.SpeakingResource;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.jpa.domain.Specification;
+import javax.persistence.*;
 
-import javax.persistence.criteria.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-public class SpeakingResourceDTO {
-    private  Long id;
+@Entity
+@Table(name="t_speakingResources")
+public class SpeakingResource {
+    private Long id;
     private String resourcesTitle;  //资源标题
     private String resourcesCategory; //资源分类
     private String resourcesText; // 资源正文
     private String resourcesTranslation_text; // 资源译文
     private String resourcesNetworkUrl; // 音频网络URL链接
     private String resourcesLocalUrl; // 音频本地URL链接
+    private String resourcesParentUrl; // 父级URL，用于去重
     private Boolean inSystem; // 资源存库标志
 
-
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     public Long getId() {
         return id;
     }
@@ -48,9 +45,15 @@ public class SpeakingResourceDTO {
         return resourcesLocalUrl;
     }
 
+    public String getResourcesParentUrl() {
+        return resourcesParentUrl;
+    }
+
     public Boolean getInSystem() {
         return inSystem;
     }
+
+    /*------------------------------------set函数----------------------------*/
 
     public void setId(Long id) {
         this.id = id;
@@ -80,8 +83,11 @@ public class SpeakingResourceDTO {
         this.resourcesLocalUrl = resourcesLocalUrl;
     }
 
+    public void setResourcesParentUrl(String resourcesParentUrl) {
+        this.resourcesParentUrl = resourcesParentUrl;
+    }
+
     public void setInSystem(Boolean inSystem) {
         this.inSystem = inSystem;
     }
-
 }

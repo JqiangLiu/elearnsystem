@@ -1,4 +1,4 @@
-package com.example.elearnsystem.common.spider;
+package com.example.elearnsystem.common.spider.pageProcessor;
 
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
@@ -38,9 +38,9 @@ public class EPageProcessor implements PageProcessor {
 //        String str = webElement.getAttribute("outerHTML"); //获取元素中的值
 //        System.out.println(page.getHtml());
         Html html = page.getHtml();
-        if (page.getUrl().regex(FIRST_PAGINATION_URL).match()){ //判断
+        if (page.getUrl().regex(FIRST_PAGINATION_URL).match()){
             if (isFirstListPageonOne(page,html)){
-//                analysisFirstPagination(page,html);
+                analysisFirstPagination(page,html);
             }
             analysisFirstListPage(page,html);
         }else if (page.getUrl().regex(SECOND_PAGINATION_URL).match() || page.getUrl().regex(SECOND_PAGINATION_URL_X).match()){
@@ -60,7 +60,7 @@ public class EPageProcessor implements PageProcessor {
     * 将首目录的链接抽取，包括所有分页的目录链接
     * 1、判断首目录是否有分页，并将第一页链接全部保存进队列*/
     private void analysisFirstListPage(Page page, Html html){
-        List<String> pageList = html.xpath("//div[@class='column_list']/dl/dt/p[1]/a/@href").all();
+        List<String> pageList = html.xpath("//div[@class='column_list']/dl[1]/dt/p[1]/a/@href").all();
         page.addTargetRequests(pageList);
     }
     /*

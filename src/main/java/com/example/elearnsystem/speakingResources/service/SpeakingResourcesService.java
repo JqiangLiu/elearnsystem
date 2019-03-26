@@ -1,17 +1,22 @@
-package com.example.elearnsystem.speaking_resources.service;
+package com.example.elearnsystem.speakingResources.service;
 
 import com.example.elearnsystem.common.util.BeanUtils;
-import com.example.elearnsystem.speaking_resources.domain.SpeakingResource;
-import com.example.elearnsystem.speaking_resources.domain.dto.SpeakingResourceDTO;
-import com.example.elearnsystem.speaking_resources.repository.SpeakingResourcesRepository;
+import com.example.elearnsystem.common.util.DownLoadFile;
+import com.example.elearnsystem.speakingResources.domain.SpeakingResource;
+import com.example.elearnsystem.speakingResources.domain.dto.SpeakingResourceDTO;
+import com.example.elearnsystem.speakingResources.domain.dto.SpeakingResourceUpdateDTO;
+import com.example.elearnsystem.speakingResources.repository.SpeakingResourcesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -42,38 +47,64 @@ public class SpeakingResourcesService implements ISpeakingResourcesService{
     @Override
     public List<SpeakingResourceDTO> findAll(Pageable pageable, String resourcesCategory, Boolean inSystem) {
         List<SpeakingResourceDTO> DTOList = new ArrayList<>();
+        Page<SpeakingResource> res;
         List<SpeakingResource> list;
+        long sum = 0;
         if (!(resourcesCategory == null) || !(inSystem == null)){
             if (!(inSystem == null) && !(resourcesCategory == null)){
-                list = speakingResourcesRepository.findAllByResourcesCategoryAndInSystem(resourcesCategory,inSystem,pageable).getContent();
+                res = speakingResourcesRepository.findAllByResourcesCategoryAndInSystem(resourcesCategory,inSystem,pageable);
+                list = res.getContent();
+                sum = res.getTotalElements();
             }else if(!(inSystem != null) && !(resourcesCategory == null)){
-                list = speakingResourcesRepository.findAllByResourcesCategory(resourcesCategory,pageable).getContent();
+                res = speakingResourcesRepository.findAllByResourcesCategory(resourcesCategory,pageable);
+                list = res.getContent();
+                sum = res.getTotalElements();
             }else{
-                list = speakingResourcesRepository.findAllByInSystem(inSystem,pageable).getContent();
+                res = speakingResourcesRepository.findAllByInSystem(inSystem,pageable);
+                list = res.getContent();
+                sum = res.getTotalElements();
             }
         }else {
-            list =  speakingResourcesRepository.findAll(pageable).getContent();
+            res =  speakingResourcesRepository.findAll(pageable);
+            list = res.getContent();
+            sum = res.getTotalElements();
         }
         for (SpeakingResource s: list
              ) {
             SpeakingResourceDTO temp = new SpeakingResourceDTO();
             BeanUtils.copyProperties(s,temp);
+            temp.setSum(sum);
             DTOList.add(temp);
         }
        return DTOList;
     }
 
-    @Override
-    public List<SpeakingResourceDTO> findAll(Specification<SpeakingResource> spec, Pageable pageable) {
-//            return speakingResourcesRepository.findAll(spec,pageable);
-            return null;
-    }
 
     @Override
-    public void update(SpeakingResource speakingResource) {
+    public void update(SpeakingResourceUpdateDTO entity) {
+        SpeakingResource speakingResource = speakingResourcesRepository.findById(entity.getId()).get();
+        BeanUtils.copyProperties(entity,speakingResource);
 //        SpeakingResource entity = speakingResourcesRepository.findById(id).get();
 //        BeanUtils.copyProperties(speakingResource,entity);
         speakingResourcesRepository.save(speakingResource);
+    }
+
+    @Override
+    public void publishAll(Long[] ids) {
+        List<Long> longs = Arrays.asList(ids);
+        List<SpeakingResource> lists = speakingResourcesRepository.findAllById(longs);
+        for (SpeakingResource list: lists) {
+            String networkUrl = list.getResourcesNetworkUrl();
+            String fileName = networkUrl.substring(36);
+            try {
+                DownLoadFile.downLoadFromUrl(networkUrl,fileName,"/static/speaking_resources_mp3");
+                list.setInSystem(true);
+                list.setResourcesLocalUrl("./src/main/resources/static/speaking_resources_mp3"+fileName);
+            }catch (Exception e){
+                System.out.println(e);
+            }
+        }
+        speakingResourcesRepository.saveAll(lists);
     }
 
     @Override

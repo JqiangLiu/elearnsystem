@@ -1,26 +1,23 @@
 package com.example.elearnsystem;
 
-import com.example.elearnsystem.common.spider.util.MyChromeDriver;
-import com.example.elearnsystem.speaking_resources.domain.SpeakingResource;
-import com.example.elearnsystem.speaking_resources.service.ISpeakingResourcesService;
+import com.example.elearnsystem.common.dtw.DynamicTimeWrapping2D;
+import com.example.elearnsystem.common.mfcc.MFCC;
+import com.example.elearnsystem.speakingResources.domain.SpeakingResource;
+import com.example.elearnsystem.speakingResources.service.ISpeakingResourcesService;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriverService;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.elearnsystem.common.spider.util.MyPhantomJSDriver.getPhantomJSDriver;
+import static com.example.elearnsystem.common.util.DownLoadFile.downLoadFromUrl;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -88,40 +85,45 @@ public class speaking_resourceTest {
         lists.clear();
     }
 
-//    @Test
-//    public void TestChromeDriver() throws IOException {
-//        WebDriver driver = MyChromeDriver.getChromeDriver();
-//        // 让浏览器访问 Baidu
-//        driver.get("https://www.taobao.com/");
-//        // 用下面代码也可以实现
-//        //driver.navigate().to("http://www.baidu.com");
-//        // 获取 网页的 title
-//        System.out.println(" Page title is: " +driver.getTitle());
-//        // 通过 id 找到 input 的 DOM
-//        WebElement element =driver.findElement(By.id("q"));
-//        // 输入关键字
-//        element.sendKeys("爽肤水");
-//        // 提交 input 所在的 form
-//        element.submit();
-//        // 通过判断 title 内容等待搜索页面加载完毕，间隔秒
-//        new WebDriverWait(driver, 10).until(new ExpectedCondition() {
-//            @Override
-//            public Object apply(Object input) {
-//                return ((WebDriver)input).getTitle().toLowerCase().startsWith("爽肤水");
-//            }
-//        });
-//        // 显示搜索结果页面的 title
-//        System.out.println(" Page title is: " +driver.getTitle());
-//        // 关闭浏览器
-//        driver.quit();
-//        // 关闭 ChromeDriver 接口
-//        service.stop();
-//    }
+    @Test
+    public void downLoadTest(){
+        try{
+            downLoadFromUrl("http://k6.kekenet.com/Sound/2016/12/cgly161222_3125113YM3.mp3",
+                    "test.mp3","./src/main/resources/static/speaking_resources_mp3");
+        }catch (Exception e) {
+            // TODO: handle exception
+        }
+    }
+    @Test
+    public void MP3ToWav(){
+        String sourcePath = "e:\\cgly170607_2126871Weg.mp3";
+        String targetPath = "e:\\test2.wav";
+        String webroot = "e:\\javaSoft\\ffmpeg-20190312-d227ed5-win64-static\\bin";
+        Runtime run = null;
+        try {
+            String path = new File(webroot).getAbsolutePath();
+            System.out.println(path);
+            run = Runtime.getRuntime();
+            Process p = run.exec(path+"\\ffmpeg -y -i "+sourcePath+" -acodec pcm_s16le -ac 1 "+targetPath);
+            p.getOutputStream().close();
+            p.getInputStream().close();
+            p.getErrorStream().close();
+            p.waitFor();
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            run.freeMemory();
+        }
 
-//    @Test
-//    public void TestPhantomJsDriver(){
-//        WebDriver driver=getPhantomJSDriver();
-//        driver.get("http://www.baidu.com");
-//        System.out.println(driver.getCurrentUrl());
-//    }
+    }
+
+    @Test
+    public void mfcc(){
+        MFCC mfcc = new MFCC();
+        double[][] result1 = mfcc.getMfcc("e:\\test2.wav");
+        double[][] result2 = mfcc.getMfcc("e:\\test2.wav");
+        DynamicTimeWrapping2D dtw = new DynamicTimeWrapping2D(result1,result2);
+        double distance = dtw.calDistance();
+        System.out.println(distance);
+    }
 }
