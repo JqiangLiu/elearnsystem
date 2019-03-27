@@ -89,7 +89,7 @@ public class SpeakingResourcesController {
     }
 
     @PostMapping("/publishAll")
-    public List<SpeakingResourceDTO> publishAll(Long[] ids, @RequestParam(name="page") int page, @RequestParam(name="limit") int limit, String resourcesCategory, Boolean inSystem){
+    public List<SpeakingResourceDTO> publishAll(@RequestParam(value = "ids[]")Long[] ids, @RequestParam(name="page") int page, @RequestParam(name="limit") int limit, String resourcesCategory, Boolean inSystem){
         try {
             speakingResourcesService.publishAll(ids);
             return utilsFind(page,limit,resourcesCategory,inSystem);

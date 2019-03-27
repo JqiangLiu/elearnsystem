@@ -13,6 +13,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -95,9 +96,9 @@ public class SpeakingResourcesService implements ISpeakingResourcesService{
         List<SpeakingResource> lists = speakingResourcesRepository.findAllById(longs);
         for (SpeakingResource list: lists) {
             String networkUrl = list.getResourcesNetworkUrl();
-            String fileName = networkUrl.substring(36);
+            String fileName = list.getId().toString() + ".mp3";
             try {
-                DownLoadFile.downLoadFromUrl(networkUrl,fileName,"/static/speaking_resources_mp3");
+                DownLoadFile.downLoadFromUrl(networkUrl,fileName,"./src/main/resources/static/speaking_resources_mp3");
                 list.setInSystem(true);
                 list.setResourcesLocalUrl("./src/main/resources/static/speaking_resources_mp3"+fileName);
             }catch (Exception e){
@@ -114,6 +115,12 @@ public class SpeakingResourcesService implements ISpeakingResourcesService{
 
     @Override
     public void deleteAll(Long[] ids) {
+            for (Long id:ids) {
+                File file = new File("./src/main/resources/static/speaking_resources_mp3/" + id + ".mp3");
+                if (file.exists() && file.isFile()) {
+                    file.delete();
+                }
+            }
             speakingResourcesRepository.deleteAll(ids);
     }
 }
