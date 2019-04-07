@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 
 @Repository
 public interface SpeakingResourcesRepository extends JpaRepository<SpeakingResource,Long>, JpaSpecificationExecutor<SpeakingResource> {
@@ -25,6 +27,7 @@ public interface SpeakingResourcesRepository extends JpaRepository<SpeakingResou
     void publishAll(Long[] ids);
 
 
+    Optional <SpeakingResource> findById(Long id);
     Page<SpeakingResource> findAllByResourcesCategory(String category,Pageable pageable);
     Page<SpeakingResource> findAllByInSystem(Boolean inSystem, Pageable pageable);
     Page<SpeakingResource> findAllByResourcesCategoryAndInSystem(String category, Boolean inSystem, Pageable pageable);

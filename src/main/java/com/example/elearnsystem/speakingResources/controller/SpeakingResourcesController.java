@@ -6,12 +6,14 @@ import com.example.elearnsystem.common.page.MyPageRequest;
 import com.example.elearnsystem.common.spider.pageProcessor.EPageProcessor;
 
 import com.example.elearnsystem.common.spider.pipeline.MySQLPipeline;
+import com.example.elearnsystem.common.util.MP3ToWav;
 import com.example.elearnsystem.speakingResources.domain.SpeakingResource;
 import com.example.elearnsystem.speakingResources.domain.dto.SpeakingResourceDTO;
 import com.example.elearnsystem.speakingResources.domain.dto.SpeakingResourceUpdateDTO;
 import com.example.elearnsystem.speakingResources.service.SpeakingResourcesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.downloader.HttpClientDownloader;
 import us.codecraft.webmagic.pipeline.ConsolePipeline;
@@ -22,6 +24,8 @@ import us.codecraft.webmagic.scheduler.component.HashSetDuplicateRemover;
 //import us.codecraft.webmagic.downloader.selenium.SeleniumDownloader;
 //import us.codecraft.webmagic.pipeline.JsonFilePipeline;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -78,6 +82,11 @@ public class SpeakingResourcesController {
         return utilsFind(page,5,resourcesCategory,true);
     }
 
+    @GetMapping("/findOne")
+    public SpeakingResourceDTO findOne(@RequestParam(value = "id")Long id){
+        return speakingResourcesService.findOne(id);
+    }
+
     @PostMapping("/update")
     public List<SpeakingResourceDTO> update(@RequestBody SpeakingResourceUpdateDTO entity,@RequestParam(name="page") int page, @RequestParam(name="limit") int limit, String resourcesCategory, Boolean inSystem){
         try {
@@ -96,6 +105,52 @@ public class SpeakingResourcesController {
         }catch (Exception e){
             return null;
         }
+    }
+
+    /*
+    *  用户录音以mp3形式保存
+    *  将mp3转成wav格式，提取mfcc特征
+    *  提取样本文件的mfcc特征
+    *  计算距离并得出相似度返回
+    */
+    @PostMapping("/uploadRecorder")
+    public String uploadRecorder(@RequestParam("file") MultipartFile file, @RequestParam("id") Long id, @RequestParam("extension") String extension){
+        if (!file.isEmpty()){
+            String recorderPath = "./src/main/resources/static/user_recorder/"+"userid"+"_"+id+extension;
+            String recorderTempPath = "./src/main/resources/static/user_recorder_temporary/"+"userid"+"_"+id+"."+extension;
+//            String recorderTempPath = "./src/main/resources/static/user_recorder_temporary/"+file.getName();
+            String resourcesMFCCPath = "./src/main/resources/static/speaking_resources_mfcc/"+id+".wav";
+            String resourcesMp3Path = "./src/main/resources/static/speaking_resources_mp3/"+id+".mp3";
+            File f = new File(recorderPath);
+            switch (extension){
+                case "mp3" :{
+                    try {   // 首先统一保存进临时文件夹，转换格式，提取特征
+                            File recorderTemp = new File(recorderTempPath);
+                            File resourcesMFCC = new File(resourcesMFCCPath);
+                            if (recorderTemp.exists())
+                                recorderTemp.delete();
+                            file.transferTo(recorderTemp);
+//                            MP3ToWav.mp3ToWav(recorderTempPath,); // 转换结束后，文件已生成
+                            if (!resourcesMFCC.exists()){
+//                                MP3ToWav.mp3ToWav();
+                            }
+                            MFCC mfcc = new MFCC();
+                            double[][] result1 = mfcc.getMfcc("e:\\test2.wav"); // 样本音频
+                            double[][] result2 = mfcc.getMfcc("e:\\test2.wav"); // 用户录音
+                            DynamicTimeWrapping2D dtw = new DynamicTimeWrapping2D(result1,result2);
+                            double distance = dtw.calDistance();
+                            System.out.println(distance);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+                case "wav" :{
+                    break;
+                }
+            }
+        }
+        return null;
     }
 
 //    @PutMapping("/updateAll")

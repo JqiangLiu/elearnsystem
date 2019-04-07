@@ -16,6 +16,7 @@ public interface ISpeakingResourcesService {
 
     //查询
     /*根据分类查询所有*/
+    public SpeakingResourceDTO findOne(Long id);
     public List<SpeakingResourceDTO> findAll(Pageable pageable, String category, Boolean inSystem);
     //修改
     public void update(SpeakingResourceUpdateDTO entity);

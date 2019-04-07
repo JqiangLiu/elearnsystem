@@ -4,8 +4,8 @@ import java.io.File;
 
 public class MP3ToWav {
     public static void mp3ToWav(String sourcePath,String targetPath) {
-//        String sourcePath = "e:\\cgly170607_2126871Weg.mp3";
-        targetPath = "e:\\speakingWav\\" + targetPath;
+//        String sourcePath = "./src/main/resources/static/user_recorder_temporary/"+sourceFile+".mp3";
+//        String targetPath = "./src/main/resources/static/user_recorder_temporary/" + sourceFile+".wav";
         String webroot = "e:\\javaSoft\\ffmpeg-20190312-d227ed5-win64-static\\bin";
         Runtime run = null;
         try {

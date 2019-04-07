@@ -46,6 +46,14 @@ public class SpeakingResourcesService implements ISpeakingResourcesService{
     }
 
     @Override
+    public SpeakingResourceDTO findOne(Long id) {
+        SpeakingResourceDTO temp = new SpeakingResourceDTO();
+        SpeakingResource entity = speakingResourcesRepository.findById(id).get();
+        BeanUtils.copyProperties(entity,temp);
+        return temp;
+    }
+
+    @Override
     public List<SpeakingResourceDTO> findAll(Pageable pageable, String resourcesCategory, Boolean inSystem) {
         List<SpeakingResourceDTO> DTOList = new ArrayList<>();
         Page<SpeakingResource> res;
@@ -100,7 +108,7 @@ public class SpeakingResourcesService implements ISpeakingResourcesService{
             try {
                 DownLoadFile.downLoadFromUrl(networkUrl,fileName,"./src/main/resources/static/speaking_resources_mp3");
                 list.setInSystem(true);
-                list.setResourcesLocalUrl("./src/main/resources/static/speaking_resources_mp3"+fileName);
+                list.setResourcesLocalUrl("./src/main/resources/static/speaking_resources_mp3/"+fileName);
             }catch (Exception e){
                 System.out.println(e);
             }
