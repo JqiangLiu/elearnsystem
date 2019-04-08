@@ -26,6 +26,7 @@ import us.codecraft.webmagic.scheduler.component.HashSetDuplicateRemover;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -114,11 +115,13 @@ public class SpeakingResourcesController {
     *  计算距离并得出相似度返回
     */
     @PostMapping("/uploadRecorder")
-    public String uploadRecorder(@RequestParam("file") MultipartFile file, @RequestParam("id") Long id, @RequestParam("extension") String extension){
+    public Double uploadRecorder(@RequestParam("file") MultipartFile file, @RequestParam("id") Long id, @RequestParam("extension") String extension){
         if (!file.isEmpty()){
             String recorderPath = "./src/main/resources/static/user_recorder/"+"userid"+"_"+id+extension;
-            String recorderTempPath = "./src/main/resources/static/user_recorder_temporary/"+"userid"+"_"+id+"."+extension;
-//            String recorderTempPath = "./src/main/resources/static/user_recorder_temporary/"+file.getName();
+//            String recorderTempPath = "./src/main/resources/static/user_recorder_temporary/"+"userid"+"_"+id+"."+extension;
+            String wavTemp = "./src/main/resources/static/user_recorder_temporary/"+"userid_temp"+"_"+id+".wav";
+            String recorderTempPathWav = "./src/main/resources/static/user_recorder_temporary/"+"userid"+"_"+id+".wav";
+            String recorderTempPath = "./src/main/resources/static/user_recorder_temporary/"+file.getName();
             String resourcesMFCCPath = "./src/main/resources/static/speaking_resources_mfcc/"+id+".wav";
             String resourcesMp3Path = "./src/main/resources/static/speaking_resources_mp3/"+id+".mp3";
             File f = new File(recorderPath);
@@ -130,22 +133,63 @@ public class SpeakingResourcesController {
                             if (recorderTemp.exists())
                                 recorderTemp.delete();
                             file.transferTo(recorderTemp);
-//                            MP3ToWav.mp3ToWav(recorderTempPath,); // 转换结束后，文件已生成
+                            MP3ToWav.toWav(recorderTempPath,recorderTempPathWav); // 转换结束后，文件已生成
                             if (!resourcesMFCC.exists()){
-//                                MP3ToWav.mp3ToWav();
+                                MP3ToWav.toWav(resourcesMp3Path,resourcesMFCCPath);
                             }
                             MFCC mfcc = new MFCC();
-                            double[][] result1 = mfcc.getMfcc("e:\\test2.wav"); // 样本音频
-                            double[][] result2 = mfcc.getMfcc("e:\\test2.wav"); // 用户录音
+                            double[][] result1 = mfcc.getMfcc(resourcesMFCCPath); // 样本音频
+                            double[][] result2 = mfcc.getMfcc(recorderTempPathWav); // 用户录音
                             DynamicTimeWrapping2D dtw = new DynamicTimeWrapping2D(result1,result2);
                             double distance = dtw.calDistance();
-                            System.out.println(distance);
+//                            if (){ // 取历史最高分进行比较，新纪录就保存新音频和记录新分数，否则不作修改
+//                                    if (f.exists()){
+//                                        f.delete();
+//                                        recorderTemp.renameTo(f); //将临时文件夹的音频移动到用户文件夹，原文件自动删除
+//                                    }
+//                            }
+                            int i = (new Double(distance)).intValue();
+                            System.out.println(i);
+                            return distance;
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     break;
                 }
                 case "wav" :{
+                    /*
+                    * 接收了直接放进temp文件夹
+                    * 进行运算评分
+                    * 刷新分数则转换成mp3存进用户文件夹*/
+                try {
+                    Double d = 2.17388371106151E303;
+                    BigDecimal b = new BigDecimal(d);
+                    System.out.println(b.toPlainString());
+                    File recorderTemp = new File(wavTemp);
+                    File resourcesMFCC = new File(resourcesMFCCPath);
+                    if (recorderTemp.exists())
+                        recorderTemp.delete();
+                    file.transferTo(recorderTemp);
+                    MP3ToWav.toWav(wavTemp, recorderTempPathWav); // 转换结束后，文件已生成
+                    recorderTemp.delete();
+                    if (!resourcesMFCC.exists()) {
+                        MP3ToWav.toWav(resourcesMp3Path, resourcesMFCCPath);
+                    }
+                    MFCC mfcc = new MFCC();
+                    double[][] result1 = mfcc.getMfcc(resourcesMFCCPath); // 样本音频
+                    double[][] result2 = mfcc.getMfcc(recorderTempPathWav); // 用户录音
+                    DynamicTimeWrapping2D dtw = new DynamicTimeWrapping2D(result1,  result2);
+                    double distance = dtw.calDistance();
+                    //                       if (){ // 取历史最高分进行比较，新纪录就保存新音频和记录新分数，否则不作修改
+//                                    if (f.exists()){
+//                                        f.delete();
+//                                            file.transferTo(f); // 保存为mp3格式，并移动到用户文件夹
+//                                    }
+//                            }
+                    return distance;
+                }catch (IOException e) {
+                    e.printStackTrace();
+                }
                     break;
                 }
             }
