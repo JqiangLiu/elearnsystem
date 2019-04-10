@@ -134,6 +134,7 @@ public class SpeakingResourcesController {
                                 recorderTemp.delete();
                             file.transferTo(recorderTemp);
                             MP3ToWav.toWav(recorderTempPath,recorderTempPathWav); // 转换结束后，文件已生成
+                            recorderTemp.delete();
                             if (!resourcesMFCC.exists()){
                                 MP3ToWav.toWav(resourcesMp3Path,resourcesMFCCPath);
                             }
