@@ -1,6 +1,7 @@
 package com.example.elearnsystem.user.domain;
 
-import com.example.elearnsystem.speakingResources.domain.SpeakingResource;
+import com.example.elearnsystem.authority.domain.Authority;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 
@@ -14,6 +15,7 @@ public class User {
     private String phoneNumber; // 手机号
     private String email;
     private String motto; // 学习格言
+    private Authority authority;
 //    @ManyToMany(targetEntity = SpeakingResource.class)
     // 使用JoinTabl来描述中间表，并描述中间表中外键与User,SpeakingResource的映射关系
     // joinColumns它是用来描述user与中间表中的映射关系
@@ -51,6 +53,12 @@ public class User {
         return motto;
     }
 
+    @OneToOne(cascade = CascadeType.ALL,mappedBy = "userMsg",optional = false)
+    @JsonIgnore(value= true)
+    public Authority getAuthority() {
+        return authority;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -77,5 +85,9 @@ public class User {
 
     public void setMotto(String motto) {
         this.motto = motto;
+    }
+
+    public void setAuthority(Authority authority) {
+        this.authority = authority;
     }
 }

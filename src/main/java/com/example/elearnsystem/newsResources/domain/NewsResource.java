@@ -8,13 +8,13 @@ public class NewsResource {
     private Long id;
     private String resourcesTitle;
     private String resourcesText;
-    private String resourcesTransation_text;
+    private String resourcesTranslation_text;
     private String resourcesCategory;
     private String resourcesImg;
     private String resourcesParentUrl; // 父级URL，用于去重
     private String resourcesDate; // 新闻日期
     private String resourcesCite; // 资源来源
-    private String inSystem; // 发布标识
+    private Boolean inSystem; // 发布标识
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -30,8 +30,8 @@ public class NewsResource {
         return resourcesText;
     }
 
-    public String getResourcesTransation_text() {
-        return resourcesTransation_text;
+    public String getResourcesTranslation_text() {
+        return resourcesTranslation_text;
     }
 
     public String getResourcesCategory() {
@@ -54,7 +54,7 @@ public class NewsResource {
         return resourcesCite;
     }
 
-    public String getInSystem() {
+    public Boolean getInSystem() {
         return inSystem;
     }
 
@@ -70,8 +70,8 @@ public class NewsResource {
         this.resourcesText = resourcesText;
     }
 
-    public void setResourcesTransation_text(String resourcesTransation_text) {
-        this.resourcesTransation_text = resourcesTransation_text;
+    public void setResourcesTranslation_text(String resourcesTranslation_text) {
+        this.resourcesTranslation_text = resourcesTranslation_text;
     }
 
     public void setResourcesCategory(String resourcesCategory) {
@@ -94,7 +94,7 @@ public class NewsResource {
         this.resourcesCite = resourcesCite;
     }
 
-    public void setInSystem(String inSystem) {
+    public void setInSystem(Boolean inSystem) {
         this.inSystem = inSystem;
     }
 }

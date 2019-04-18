@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MySQLPipeline implements CollectorPipeline<SpeakingResource> {
+public class MySQLPipelineSpeaking implements CollectorPipeline<SpeakingResource> {
     private List<SpeakingResource> collector = new ArrayList<SpeakingResource>();
     @Override
     public void process(ResultItems resultItems, Task task) {

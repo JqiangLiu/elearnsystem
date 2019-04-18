@@ -5,7 +5,7 @@ import com.example.elearnsystem.common.mfcc.MFCC;
 import com.example.elearnsystem.common.page.MyPageRequest;
 import com.example.elearnsystem.common.spider.pageProcessor.EPageProcessor;
 
-import com.example.elearnsystem.common.spider.pipeline.MySQLPipeline;
+import com.example.elearnsystem.common.spider.pipeline.MySQLPipelineSpeaking;
 import com.example.elearnsystem.common.util.MP3ToWav;
 import com.example.elearnsystem.speakingResources.domain.SpeakingResource;
 import com.example.elearnsystem.speakingResources.domain.dto.SpeakingResourceDTO;
@@ -19,8 +19,6 @@ import us.codecraft.webmagic.downloader.HttpClientDownloader;
 import us.codecraft.webmagic.pipeline.ConsolePipeline;
 import us.codecraft.webmagic.pipeline.ResultItemsCollectorPipeline;
 import us.codecraft.webmagic.scheduler.FileCacheQueueScheduler;
-import us.codecraft.webmagic.scheduler.QueueScheduler;
-import us.codecraft.webmagic.scheduler.component.HashSetDuplicateRemover;
 //import us.codecraft.webmagic.downloader.selenium.SeleniumDownloader;
 //import us.codecraft.webmagic.pipeline.JsonFilePipeline;
 
@@ -40,16 +38,15 @@ public class SpeakingResourcesController {
     @PostMapping("/search")
     public int searchResources(String resourcesCategory){
         int sum = 0;
-        MySQLPipeline mySQLPipeline = new MySQLPipeline();
+        MySQLPipelineSpeaking mySQLPipeline = new MySQLPipelineSpeaking();
         //1、调用爬虫去抓
         Spider spider = Spider.create(new EPageProcessor());
         //重写Downloader，解决用phantomJS渲染页面重复下载的BUG
 //        SeleniumDownloader seleniumDownloader = new SeleniumDownloader();
         spider.setDownloader(new HttpClientDownloader());
-        spider.setScheduler(new FileCacheQueueScheduler("./src/main/resources/static/cacheQueueFile"));
+        spider.setScheduler(new FileCacheQueueScheduler("./src/main/resources/static/cacheQueueFileofSpeaking"));
         spider.addPipeline(new ConsolePipeline()).addPipeline(mySQLPipeline).addPipeline(new ResultItemsCollectorPipeline());
         spider.addUrl("http://xiu.kekenet.com/index.php/main/column.html?tag_id="+resourcesCategory).thread(5).run();
-//        System.out.println("抓完了！！！！");
         List<SpeakingResource> list = mySQLPipeline.getCollected();
         for (SpeakingResource entity: list) {
             entity.setResourcesCategory(resourcesCategory);
@@ -60,16 +57,7 @@ public class SpeakingResourcesController {
 
     @PostMapping("/saveAll")
     public int saveAll(List<SpeakingResource> list,int updateSum){
-//        String resourcesCategory = null;
-//        Boolean inSystem = null;
-//        MyPageRequest pageReq = new MyPageRequest();
-//        pageReq.setPage(1);
-//        pageReq.setLimit(15);
-//        pageReq.setSort("id");
-//        pageReq.setDir("ASC");
         speakingResourcesService.saveAll(list);
-//        List<SpeakingResourceDTO> dto = speakingResourcesService.findAll(pageReq.getPageable(),resourcesCategory,inSystem);
-//        dto.get(0).setUpdateSum(updateSum);
         return updateSum;
     }
 
@@ -198,19 +186,8 @@ public class SpeakingResourcesController {
         return null;
     }
 
-//    @PutMapping("/updateAll")
-//    public List<SpeakingResourceDTO> allinSystem(){
-//        MyPageRequest pageReq = new MyPageRequest();
-//        pageReq.setPage(1);
-//        pageReq.setLimit(15);
-//        pageReq.setSort("inSystem");
-//        pageReq.setDir("ASC");
-//        return speakingResourcesService.findAll(pageReq.getPageable());
-//    }
-
     @DeleteMapping
     public List<SpeakingResourceDTO> delete(@RequestParam(value = "ids[]")Long[] ids,@RequestParam(name="page") int page, @RequestParam(name="limit") int limit, String resourcesCategory, Boolean inSystem){
-//        Long[] mids = {43L,44L,46L};
         speakingResourcesService.deleteAll(ids);
         return utilsFind(page,limit,resourcesCategory,inSystem);
     }

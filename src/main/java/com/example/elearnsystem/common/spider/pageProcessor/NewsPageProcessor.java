@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NewsPageProcessor implements PageProcessor{
-    private static boolean flag = true;
+    private static boolean flag = false;
     private String LIST_URL = "http://www\\.kekenet\\.com/read/news/([\\s\\S]*)";
     private Site site = Site
             .me().setCharset("UTF-8")
@@ -65,7 +65,22 @@ public class NewsPageProcessor implements PageProcessor{
     }
 
     private void analysisDetailPage(Page page,Html html){ // 抽取详细页内容
+        page.putField("resourcesParentUrl",page.getUrl().toString());
         page.putField("resourceImg",html.xpath("//div[@class='info-qh']//img/@src").toString());
-        page.putField("resourcesText",html.xpath(""));
+        page.putField("resourcesTitle",html.xpath("//div[@class='e_title']/h1/text()").toString());
+        page.putField("resourcesDate",html.xpath("//cite/time/text()").regex("时间:([\\s\\S]*)").toString());
+        page.putField("resourcesCite",html.xpath("//cite/text()").toString());
+        List<String> listEn = html.xpath("//div[@class='info-qh']/div[@class='qh_en']").all();
+        List<String> listZg = html.xpath("//div[@class='info-qh']/div[@class='qh_zg']").all();
+        StringBuffer contentText = new StringBuffer();
+        StringBuffer contentTranslationText = new StringBuffer();
+        for (String s:listEn) {
+            contentText.append(s.substring(s.indexOf(">")+1,s.indexOf("</div>")));
+        }
+        for (String s:listZg) {
+            contentTranslationText.append(s.substring(s.indexOf(">")+1,s.indexOf("</div>")));
+        }
+        page.putField("resourcesText",contentText);
+        page.putField("resourcesTranslation_text",contentTranslationText);
     }
 }
