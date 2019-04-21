@@ -23,8 +23,6 @@ public class AuthorityController {
     @PostMapping("/register")
     public String register(@RequestBody Authority authority){
         try{
-            String password = MD5Utils.MD5Encode(authority.getPassword(),"");
-            authority.setPassword(password);
             User user = new User();
             authority.setDownload(true);
             authority.setRole("user");
@@ -49,15 +47,16 @@ public class AuthorityController {
     public MyResult login(@RequestBody Authority authority, HttpSession session){
         String token = UUID.randomUUID().toString().replace("-", "");
         String userName = authority.getUserName();
-        String password = MD5Utils.MD5Encode(authority.getPassword(),"");
+        String password = authority.getPassword();
         Authority entity = iAuthorityService.login(userName);
         MyResult myResult = null;
         if (entity != null && entity.getPassword().equals(password)){
+            session.setAttribute("id",entity.getId());
             session.setAttribute("useName",entity.getUserName());
             session.setAttribute("password",entity.getPassword());
-             myResult = new MyResult(entity.getUserMsg(),token,"success");
+             myResult = new MyResult(entity,token,"success");
         }else{
-            myResult = new MyResult(entity.getUserMsg(),"","false");
+            myResult = new MyResult(entity,"","false");
         }
         return myResult;
     }

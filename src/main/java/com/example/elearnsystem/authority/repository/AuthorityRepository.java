@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 
 public interface AuthorityRepository extends JpaRepository<Authority,Long>, JpaSpecificationExecutor<Authority> {
-    @Query("select id from Authority a where a.userName = ?1")
+    @Query("select a.id from Authority a where a.userName = ?1")
     public Long getUserName(String userName);
 
     public Authority findAllByUserName(String userName);

@@ -22,7 +22,7 @@ public class ElearnsystemApplication {
     @Bean
     MultipartConfigElement multipartConfigElement() {
         MultipartConfigFactory factory = new MultipartConfigFactory();
-        factory.setLocation("C:\\Users\\Administrator\\IdeaProjects\\elearnsystem");
+        factory.setLocation("C:\\Users\\Mr.Liu\\IdeaProjects\\elearnsystem");
         return factory.createMultipartConfig();
     }
 }

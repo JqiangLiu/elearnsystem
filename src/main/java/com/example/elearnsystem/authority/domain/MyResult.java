@@ -5,15 +5,15 @@ import com.example.elearnsystem.user.domain.User;
 import java.util.Map;
 
 public class MyResult {
-    private User userInfo;
+    private Authority userInfo;
     private String token;
     private String message;
 
-    public User getUserInfo() {
+    public Authority getUserInfo() {
         return userInfo;
     }
 
-    public void setUserInfo(User userInfo) {
+    public void setUserInfo(Authority userInfo) {
         this.userInfo = userInfo;
     }
 
@@ -33,7 +33,7 @@ public class MyResult {
         this.message = message;
     }
 
-    public MyResult(User userInfo, String token, String message) {
+    public MyResult(Authority userInfo, String token, String message) {
         this.userInfo = userInfo;
         this.token = token;
         this.message = message;

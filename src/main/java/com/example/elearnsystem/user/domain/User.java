@@ -10,7 +10,7 @@ import javax.persistence.*;
 public class User {
     private Long id;
     private String name; // 用户名称
-    private String photo; // 头像
+    private String avatorImgPath; // 头像
     private String occupation; // 职业
     private String phoneNumber; // 手机号
     private String email;
@@ -33,8 +33,8 @@ public class User {
         return name;
     }
 
-    public String getPhoto() {
-        return photo;
+    public String getAvatorImgPath() {
+        return avatorImgPath;
     }
 
     public String getOccupation() {
@@ -67,8 +67,8 @@ public class User {
         this.name = name;
     }
 
-    public void setPhoto(String photo) {
-        this.photo = photo;
+    public void setAvatorImgPath(String avatorImgPath) {
+        this.avatorImgPath = avatorImgPath;
     }
 
     public void setOccupation(String occupation) {
