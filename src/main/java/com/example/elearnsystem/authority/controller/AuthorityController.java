@@ -53,7 +53,8 @@ public class AuthorityController {
         Authority entity = iAuthorityService.login(userName);
         MyResult myResult = null;
         if (entity != null && entity.getPassword().equals(password)){
-            SessionUtils.setUser(authority,session);
+            session.setAttribute("useName",entity.getUserName());
+            session.setAttribute("password",entity.getPassword());
              myResult = new MyResult(entity.getUserMsg(),token,"success");
         }else{
             myResult = new MyResult(entity.getUserMsg(),"","false");

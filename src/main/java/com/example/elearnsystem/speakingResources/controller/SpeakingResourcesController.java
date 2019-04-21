@@ -22,6 +22,7 @@ import us.codecraft.webmagic.scheduler.FileCacheQueueScheduler;
 //import us.codecraft.webmagic.downloader.selenium.SeleniumDownloader;
 //import us.codecraft.webmagic.pipeline.JsonFilePipeline;
 
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -62,7 +63,8 @@ public class SpeakingResourcesController {
     }
 
     @GetMapping("/find")
-    public List<SpeakingResourceDTO> find(@RequestParam(name="page") int page, @RequestParam(name="limit") int limit, String resourcesCategory, Boolean inSystem){
+    public List<SpeakingResourceDTO> find(@RequestParam(name="page") int page, @RequestParam(name="limit") int limit, String resourcesCategory, Boolean inSystem, HttpSession session){
+        System.out.println(session.getId());
         return utilsFind(page,limit,resourcesCategory,inSystem);
     }
 

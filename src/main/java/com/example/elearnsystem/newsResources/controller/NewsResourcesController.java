@@ -14,6 +14,7 @@ import us.codecraft.webmagic.pipeline.ConsolePipeline;
 import us.codecraft.webmagic.pipeline.ResultItemsCollectorPipeline;
 import us.codecraft.webmagic.scheduler.FileCacheQueueScheduler;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
@@ -48,7 +49,8 @@ public class NewsResourcesController {
     }
 
     @GetMapping("/find")
-    public List<NewsResourceDTO> find(@RequestParam(name="page") int page, @RequestParam(name="limit") int limit, String resourcesCategory, Boolean inSystem){
+    public List<NewsResourceDTO> find(@RequestParam(name="page") int page, @RequestParam(name="limit") int limit, String resourcesCategory, Boolean inSystem, HttpSession session){
+        System.out.println(session.getId());
         return utilsFind(page,limit,resourcesCategory,inSystem);
     }
 
