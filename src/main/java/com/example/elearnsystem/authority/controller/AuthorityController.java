@@ -24,6 +24,7 @@ public class AuthorityController {
     public String register(@RequestBody Authority authority){
         try{
             User user = new User();
+            user.setAvatorImgPath("/img/headImg/defineImg.png");
             authority.setDownload(true);
             authority.setRole("user");
             authority.setUserMsg(user);
