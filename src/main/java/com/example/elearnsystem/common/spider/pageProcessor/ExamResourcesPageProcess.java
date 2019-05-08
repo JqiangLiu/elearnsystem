@@ -8,10 +8,12 @@ import us.codecraft.webmagic.selector.Html;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ExamResourcesPageProcess implements PageProcessor {
+    private static boolean flag = true;
     private Site site = Site
             .me().setCharset("UTF-8")
             .setCycleRetryTimes(3) // 重试次数
@@ -21,15 +23,14 @@ public class ExamResourcesPageProcess implements PageProcessor {
             .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/71.0.3578.80 Safari/535.1"); //User-Agent的内容包含发出请求的用户信息
     @Override
     public void process(Page page) {
-//        Html html = page.getHtml();
-//        if (page.getUrl().regex(FIRST_PAGINATION_URL).match()){
-//            if (isFirstListPageonOne(page,html)){
-//                analysisFirstPagination(page,html);
-//            }
-//            analysisFirstListPage(page,html);
-//        }else {
-//            analysisDetailPage(page,html);
-//        }
+        Html html = page.getHtml();
+        if (flag){
+            analysisDetailPageFirst(page,html);
+        }
+        else {
+            analysisDetailPageSecond(page,html);
+        }
+
     }
 
     @Override
@@ -37,42 +38,54 @@ public class ExamResourcesPageProcess implements PageProcessor {
         return site;
     }
 
-    /*
-     * 将首目录的链接抽取，包括所有分页的目录链接
-     * 1、判断首目录是否有分页，并将第一页链接全部保存进队列*/
-    private void analysisFirstListPage(Page page, Html html){
-        List<String> pageList = html.xpath("//ul[@id=\"menu-list\"]/li/h2/a[2]/@href").all();
-        page.addTargetRequests(pageList);
+    private void analysisDetailPageFirst(Page page, Html html){
+        List<String> pageList = html.xpath("//div[@class='pic']/div/a/@href").all();
+        /**用set集合进行过滤*/
+        List<String> uniquePageList = new ArrayList<String>(new HashSet<String>(pageList));
+        List<String> list = new ArrayList<>();
+        for (String s:uniquePageList) {
+            list.add("www.kekenet.com" + s);
+        }
+        page.addTargetRequests(list);
+        flag = false;
+        page.putField("resourcesParentUrl",page.getUrl().toString());
+        page.putField("resourcesTitle",html.xpath("//div[@class='e_title']/h1/text()").toString());
+        page.putField("resourcesDate",html.xpath("//cite/time/text()").regex("时间:([\\s\\S]*)").toString());
+        page.putField("resourcesCite",html.xpath("//cite/text()").toString());
+        page.putField("resourcesNetworkUrl","http://k6.kekenet.com/"+html.xpath("//div[@style='margin-bottom:4px;']/script[2]")
+                .regex("var thunder_url =\"([\\s\\S]*)mp3").toString()+"mp3");
+        List<String> listEn = html.xpath("//div[@class='info-qh']/div[@class='qh_en']").all();
+        List<String> listZg = html.xpath("//div[@class='info-qh']/div[@class='qh_zg']").all();
+        StringBuffer contentText = new StringBuffer();
+        StringBuffer contentTranslationText = new StringBuffer();
+        for (String s:listEn) {
+            contentText.append(s.substring(s.indexOf(">")+1,s.indexOf("</div>")));
+        }
+        for (String s:listZg) {
+            contentTranslationText.append(s.substring(s.indexOf(">")+1,s.indexOf("</div>")));
+        }
+        page.putField("resourcesText",contentText);
+        page.putField("resourcesTranslation_text",contentTranslationText);
     }
 
-    /*
-     * 分析首目录分页规则
-     * */
-    private void analysisFirstPagination(Page page, Html html){
-        int i = 2;
-//        String s = html.xpath("//*[@id=\"list_container\"]/div/div/div/em/text()").all().toString();
-//        Integer sumPageNum = 0;
-//        if (!s.equals("")){
-//            String regEx="[^0-9]";
-//            Pattern p = Pattern.compile(regEx);
-//            Matcher m = p.matcher(s);
-//            String r = m.replaceAll("").trim();
-//            if (r.length() > 0){
-//                sumPageNum = Integer.parseInt(m.replaceAll("").trim())/7+1;
-//            }
-//        }
-        List<String> pageList = new ArrayList<>();
-        while (i<=50){
-            String cpage = page.getUrl()+"&tab=spoken&page="+i;
-            pageList.add(cpage);
-            ++i;
+    private void analysisDetailPageSecond(Page page, Html html){
+        page.putField("resourcesParentUrl",page.getUrl().toString());
+        page.putField("resourcesTitle",html.xpath("//div[@class='e_title']/h1/text()").toString());
+        page.putField("resourcesDate",html.xpath("//cite/time/text()").regex("时间:([\\s\\S]*)").toString());
+        page.putField("resourcesCite",html.xpath("//cite/text()").toString());
+        page.putField("resourcesNetworkUrl","http://k6.kekenet.com/"+html.xpath("//div[@style='margin-bottom:4px;']/script[2]")
+                .regex("var thunder_url =\"([\\s\\S]*)mp3").toString()+"mp3");
+        List<String> listEn = html.xpath("//div[@class='info-qh']/div[@class='qh_en']").all();
+        List<String> listZg = html.xpath("//div[@class='info-qh']/div[@class='qh_zg']").all();
+        StringBuffer contentText = new StringBuffer();
+        StringBuffer contentTranslationText = new StringBuffer();
+        for (String s:listEn) {
+            contentText.append(s.substring(s.indexOf(">")+1,s.indexOf("</div>")));
         }
-        pageList = new ArrayList(new HashSet(pageList));
-
-        List<String> pageParameterList = new ArrayList<>();
-        for (String value: pageList) {
-            pageParameterList.add(value);
+        for (String s:listZg) {
+            contentTranslationText.append(s.substring(s.indexOf(">")+1,s.indexOf("</div>")));
         }
-        page.addTargetRequests(pageParameterList);
+        page.putField("resourcesText",contentText);
+        page.putField("resourcesTranslation_text",contentTranslationText);
     }
 }

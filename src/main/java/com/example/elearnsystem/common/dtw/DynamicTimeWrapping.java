@@ -1,7 +1,8 @@
 package com.example.elearnsystem.common.dtw;
 
 public abstract class DynamicTimeWrapping {
-    protected int globalPathConstraint = 20;
+    protected int headConstraint = 20;
+    protected int globalPathConstraint = 500;
 
     /**
      * Calculate the distance between two feature vectors.

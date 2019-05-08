@@ -10,6 +10,8 @@ import javax.persistence.*;
 public class User {
     private Long id;
     private String name; // 用户名称
+    private String gender; // 用户性别
+    private String birthday; // 出生日期
     private String avatorImgPath; // 头像
     private String occupation; // 职业
     private String phoneNumber; // 手机号
@@ -53,6 +55,14 @@ public class User {
         return motto;
     }
 
+    public String getGender() {
+        return gender;
+    }
+
+    public String getBirthday() {
+        return birthday;
+    }
+
     @OneToOne(cascade = CascadeType.ALL,mappedBy = "userMsg",optional = false)
     @JsonIgnore(value= true)
     public Authority getAuthority() {
@@ -89,5 +99,13 @@ public class User {
 
     public void setAuthority(Authority authority) {
         this.authority = authority;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
     }
 }

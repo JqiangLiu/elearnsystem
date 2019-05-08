@@ -1,8 +1,5 @@
 package com.example.elearnsystem.authority.domain;
 
-import com.example.elearnsystem.user.domain.User;
-
-import java.util.Map;
 
 public class MyResult {
     private Authority userInfo;

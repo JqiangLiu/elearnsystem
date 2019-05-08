@@ -6,5 +6,7 @@ public interface IUserService {
 
     public User find(Long id);
 
+    public String findAvator(Long id);
+
     public User update(User user);
 }

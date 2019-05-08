@@ -1,6 +1,7 @@
 package com.example.elearnsystem;
 
 import com.example.elearnsystem.authority.domain.Authority;
+import com.example.elearnsystem.authority.domain.Manager;
 import com.example.elearnsystem.authority.service.IAuthorityService;
 import com.example.elearnsystem.common.util.MD5Utils;
 import com.example.elearnsystem.user.domain.User;

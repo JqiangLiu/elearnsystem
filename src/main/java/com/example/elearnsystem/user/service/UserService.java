@@ -19,6 +19,11 @@ public class UserService implements IUserService{
     }
 
     @Override
+    public String findAvator(Long id) {
+        return userRepository.findAvator(id);
+    }
+
+    @Override
     public User update(User user) {
         return userRepository.save(user);
     }

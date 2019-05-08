@@ -10,7 +10,7 @@ public class DynamicTimeWrapping2D extends DynamicTimeWrapping{
     private double[] variance;
     private Map<String,Double> DTW; // 稀疏矩阵进行压缩
 
-    public DynamicTimeWrapping2D(double[][] test, double[][] reference)
+    public DynamicTimeWrapping2D(double[][] reference, double[][] test)
     {
         this.test = test;
         this.reference = reference;
@@ -20,7 +20,7 @@ public class DynamicTimeWrapping2D extends DynamicTimeWrapping{
             variance[i] = 1;
     }
 
-    public DynamicTimeWrapping2D(double[][] test, double[][] reference, double[] variance)
+    public DynamicTimeWrapping2D(double[][] reference, double[][] test, double[] variance)
     {
         this.test = test;
         this.reference = reference;
@@ -66,7 +66,8 @@ public class DynamicTimeWrapping2D extends DynamicTimeWrapping{
         // DP comes here...
         for (int i = 1; i < n; i++)
         {
-            for (int j = Math.max(1, i-globalPathConstraint); j < Math.min(m, i+globalPathConstraint); j++)
+            int z = Math.min(m-globalPathConstraint,i*2-headConstraint);
+            for (int j = i-headConstraint<=0?1:z; j < Math.min(m, z+globalPathConstraint); j++)
             {   // consider five different moves.
                 double cost = getDistance(test[i],reference[j]);
 //                double d1 = cost + DTW[i-1][j];
@@ -90,7 +91,7 @@ public class DynamicTimeWrapping2D extends DynamicTimeWrapping{
         }
 
 //        return DTW[n-1][m-1] /(m+n);
-        return getDTW(n-1,m-1) /(m+n);
+        return Math.round(100-(getDTW(n-1,m-1)*40 /(m+n)));
     }
 
     /**
@@ -98,8 +99,8 @@ public class DynamicTimeWrapping2D extends DynamicTimeWrapping{
      * vector have the same dimension. When calculating such Euclidean distance,
      * we need to take variance into account.
      *
-     * @param vec1        the first feature vector
-     * @param vec2        the second feature vector
+     * @param vec1        测试数据
+     * @param vec2        模板数据
      * @param variance    variance for each dimension.
      * @return            Normalized Euclidean distance (or in manhatan distance,
      *                    the covariance matrix is diagonal matrix, where each diagonal
@@ -107,11 +108,16 @@ public class DynamicTimeWrapping2D extends DynamicTimeWrapping{
      */
     private double getDistance(double[] vec1, double[] vec2)
     {
+        int valid = 0;
         double distance = 0.0;
-        for(int i = 0; i < vec1.length; i++)
-            distance += (vec1[i] - vec2[i]) * (vec1[i] - vec2[i]) / variance[i];
-
-        return Math.sqrt(distance);
+        for(int i = 0; i < vec1.length; i++) {
+            if (Math.max(Math.abs(vec1[i]),Math.abs(vec2[i])) == 0){
+                valid++;
+                continue;
+            }
+            distance += (Math.abs(Math.abs(vec1[i])-Math.abs(vec2[i])) / variance[i])/Math.max(Math.abs(vec1[i]),Math.abs(vec2[i]));
+        }
+        return distance*100/12;
     }
 
     // 添加矩阵元素

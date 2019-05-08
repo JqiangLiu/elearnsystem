@@ -106,9 +106,9 @@ public class SpeakingResourcesService implements ISpeakingResourcesService{
             String networkUrl = list.getResourcesNetworkUrl();
             String fileName = list.getId().toString() + ".mp3";
             try {
-                DownLoadFile.downLoadFromUrl(networkUrl,fileName,"./src/main/resources/static/speaking_resources_mp3");
+                DownLoadFile.downLoadFromUrl(networkUrl,fileName,"E://eSystemResources/speaking_resources_mp3");
                 list.setInSystem(true);
-                list.setResourcesLocalUrl("./src/main/resources/static/speaking_resources_mp3/"+fileName);
+                list.setResourcesLocalUrl("E://eSystemResources/speaking_resources_mp3/"+fileName);
             }catch (Exception e){
                 System.out.println(e);
             }
@@ -124,7 +124,7 @@ public class SpeakingResourcesService implements ISpeakingResourcesService{
     @Override
     public void deleteAll(Long[] ids) {
             for (Long id:ids) {
-                File file = new File("./src/main/resources/static/speaking_resources_mp3/" + id + ".mp3");
+                File file = new File("E://eSystemResources/speaking_resources_mp3/" + id + ".mp3");
                 if (file.exists() && file.isFile()) {
                     file.delete();
                 }

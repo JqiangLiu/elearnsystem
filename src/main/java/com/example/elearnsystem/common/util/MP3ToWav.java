@@ -12,7 +12,7 @@ public class MP3ToWav {
             String path = new File(webroot).getAbsolutePath();
             System.out.println(path);
             run = Runtime.getRuntime();
-            Process p = run.exec(path + "/ffmpeg -y -i " + sourcePath + " -acodec pcm_s16le -ac 1 " + targetPath);
+            Process p = run.exec(path + "/ffmpeg -y -i " + sourcePath + " -ar 16000 -acodec pcm_s16le -ac 1 " + targetPath);
             p.getOutputStream().close();
             p.getInputStream().close();
             p.getErrorStream().close();
